@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp">
+
+    <EditText
+        android:id="@+id/editname"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:text="Hello World"/>
+
+    <Button
+        android:id="@+id/saveeditedname"
+        android:layout_width="100dp"
+        android:layout_height="20dp"
+        android:layout_below="@id/editname"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="23dp"
+        android:layout_marginRight="22dp"
+        android:text="SUBMIT"
+        android:layout_marginBottom="4dp"
+        android:background="@android:color/holo_purple" />
+</RelativeLayout>
