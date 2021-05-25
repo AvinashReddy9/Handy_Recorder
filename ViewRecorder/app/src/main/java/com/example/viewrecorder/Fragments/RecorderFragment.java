@@ -1,23 +1,19 @@
 package com.example.viewrecorder.Fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
@@ -37,9 +33,7 @@ import com.example.viewrecorder.R;
 import java.io.File;
 import java.io.IOException;
 
-import static androidx.core.app.ActivityCompat.finishAffinity;
 import static com.example.viewrecorder.Fragments.PlayListFragment.recordingAdapter;
-import static com.example.viewrecorder.Fragments.PlayListFragment.recyclerViewRecordings;
 import static com.example.viewrecorder.Fragments.PlayListFragment.refreshRecylerView;
 
 public class RecorderFragment extends Fragment implements View.OnClickListener {
@@ -90,7 +84,8 @@ public class RecorderFragment extends Fragment implements View.OnClickListener {
         imageViewStop = view.findViewById(R.id.imageViewStop);
         imageViewPlay = view.findViewById(R.id.imageViewPlay);
         linearLayoutPlay = view.findViewById(R.id.linearLayoutPlay);
-        seekBar = view.findViewById(R.id.seekBar);
+        seekBar = view.findViewById(R.id.seekBarRecorder);
+        seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#FF0000"), PorterDuff.Mode.MULTIPLY);
 
         imageViewRecord.setOnClickListener(this);
         imageViewStop.setOnClickListener(this);
@@ -175,7 +170,7 @@ public class RecorderFragment extends Fragment implements View.OnClickListener {
         }
         mPlayer = null;
         //showing the play button
-        imageViewPlay.setImageResource(R.drawable.ic_play);
+        imageViewPlay.setImageResource(R.drawable.recorder_play);
         chronometer.stop();
 
     }
@@ -249,7 +244,7 @@ public class RecorderFragment extends Fragment implements View.OnClickListener {
             Log.e("LOG_TAG", "prepare() failed");
         }
         //making the imageview pause button
-        imageViewPlay.setImageResource(R.drawable.ic_pause);
+        imageViewPlay.setImageResource(R.drawable.recorder_pause);
 
         seekBar.setProgress(lastProgress);
         mPlayer.seekTo(lastProgress);
@@ -261,7 +256,7 @@ public class RecorderFragment extends Fragment implements View.OnClickListener {
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                imageViewPlay.setImageResource(R.drawable.ic_play);
+                imageViewPlay.setImageResource(R.drawable.recorder_play);
                 isPlaying = false;
                 chronometer.stop();
             }

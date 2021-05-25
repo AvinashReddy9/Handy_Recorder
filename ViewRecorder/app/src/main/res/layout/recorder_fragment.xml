@@ -38,20 +38,20 @@
 
             <ImageView
                 android:id="@+id/imageViewPlay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="40dp"
+                android:layout_height="35dp"
                 android:layout_gravity="center_vertical"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@drawable/ic_play"
-                app:tint="@android:color/darker_gray" />
+                android:src="@drawable/recorder_play" />
 
             <SeekBar
-                android:id="@+id/seekBar"
+                android:id="@+id/seekBarRecorder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:thumbTint="#FF0000"
                 android:layout_weight="1" />
 
         </LinearLayout>
@@ -75,19 +75,18 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@drawable/ic_microphone" />
+                android:src="@drawable/recorder_microphone" />
 
             <ImageView
                 android:id="@+id/imageViewStop"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_gravity="center_vertical"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@drawable/ic_stop"
-                android:visibility="gone"
-                app:tint="@android:color/darker_gray" />
+                android:src="@drawable/recorder_stop_button"
+                android:visibility="gone" />
 
         </LinearLayout>
 

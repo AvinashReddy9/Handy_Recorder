@@ -160,7 +160,7 @@ public class PlayListFragment extends Fragment {
                 if(!mHashMap.containsKey(fileName)) {
                     Log.e("INFO", "New Recording has been created");
                     mHashMap.put(fileName, 1);
-                    recordingArraylist.add(recording);
+                    recordingArraylist.add(0,recording);
                     setAdaptertoRecyclerView();
                 }
             }

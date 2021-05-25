@@ -2,9 +2,12 @@ package com.example.viewrecorder.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -27,8 +30,6 @@ import com.example.viewrecorder.model.Recording;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.example.viewrecorder.Fragments.RecorderFragment.getFilename;
-
 public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.ViewHolder>{
 
     private Context context;
@@ -37,6 +38,7 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
     private boolean isPlaying = false;
     private int last_index = -1;
     private static final String TAG = "RecordingAdapter";
+    private boolean isARecordingPlaying = false;
     public RecordingAdapter(Context context, ArrayList<Recording> recordingArrayList){
         this.context = context;
         this.recordingArrayList = recordingArrayList;
@@ -76,15 +78,15 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
         }
 
         if (recording.isPlaying()) {
-            holder.imageViewPlay.setImageResource(R.drawable.ic_pause);
+            holder.imageViewPlay.setImageResource(R.drawable.recorder_pause);
             TransitionManager.beginDelayedTransition((ViewGroup) holder.itemView);
             holder.seekBar.setVisibility(View.VISIBLE);
             holder.seekUpdation(holder);
         } else {
 //            if(holder != null) {
-//                holder.imageViewPlay.setImageResource(R.drawable.ic_play);
-//                TransitionManager.beginDelayedTransition((ViewGroup) holder.itemView);
-//                holder.seekBar.setVisibility(View.GONE);
+                holder.imageViewPlay.setImageResource(R.drawable.recorder_play);
+                TransitionManager.beginDelayedTransition((ViewGroup) holder.itemView);
+                holder.seekBar.setVisibility(View.GONE);
 //            }
         }
 
@@ -129,8 +131,9 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
             view =itemView;
             final View mView = itemView;
 
-        //    imageViewPlay = itemView.findViewById(R.id.imageViewPlay);
-            seekBar = itemView.findViewById(R.id.seekBar);
+            imageViewPlay = itemView.findViewById(R.id.imageViewPlay);
+            seekBar = itemView.findViewById(R.id.seekBarRecorder);
+            seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#FF0000"), PorterDuff.Mode.MULTIPLY);
             textViewName = itemView.findViewById(R.id.textViewRecordingname);
             shareButton = itemView.findViewById(R.id.share_Button);
             mCardView = itemView.findViewById(R.id.cardview);
@@ -155,63 +158,67 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
             shareButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.e("CLICKED" , "Clicked share button" + getAdapterPosition());
+                    Log.e("CLICKED", "Clicked share button file name " + getRecordingName(getAdapterPosition()));
+                    String filePath = new String(Environment.getExternalStorageDirectory() + "/ViewRecorder/Audios/" +  getRecordingName(getAdapterPosition()));
                     Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                     sharingIntent.setType("audio/*");
-                    String shareBody = getFilename();
-                    Uri uri = Uri.parse(shareBody);
+                    Uri uri = Uri.parse(filePath);
                     sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
                  //   sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                     mView.getContext().startActivity(Intent.createChooser(sharingIntent, "Share via"));
                 }
             });
 
-//            imageViewPlay.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) mCardView.getLayoutParams();
-//                    params.height = params.height + 20;
-//                    mCardView.setLayoutParams(params);
-//                    int position = getAdapterPosition();
-//                    Recording recording = recordingArrayList.get(position);
-//                    recordingUri = recording.getUri();
-//
-//                    if( isPlaying ){
-//                        stopPlaying();
-//                        if( position == last_index ){
-//                            recording.setPlaying(false);
-//                            stopPlaying();
-//                            notifyItemChanged(position);
-//                        }else{
-//                            markAllPaused();
-//                            recording.setPlaying(true);
-//                            notifyItemChanged(position);
-//                            startPlaying(recording,position);
-//                            last_index = position;
-//                        }
-//
-//                    }else {
-//                        if( recording.isPlaying() ){
-//                            recording.setPlaying(false);
-//                            stopPlaying();
-//                            seekBar.setVisibility(View.GONE);
-//                            params.height = params.height - 20;
-//                            mCardView.setLayoutParams(params);
-//                            Log.d("isPlayin","True");
-//                        }else {
-//                            startPlaying(recording,position);
-//                            recording.setPlaying(true);
-//                            seekBar.setMax(mPlayer.getDuration());
-//                            params.height = params.height - 20;
-//                            mCardView.setLayoutParams(params);
-//                            Log.d("isPlayin","False");
-//                        }
-//                        notifyItemChanged(position);
-//                        last_index = position;
-//                    }
-//
-//                }
-//
-//            });
+            imageViewPlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) mCardView.getLayoutParams();
+                    params.height = params.height + 20;
+                    mCardView.setLayoutParams(params);
+                    int position = getAdapterPosition();
+                    Recording recording = recordingArrayList.get(position);
+                    recordingUri = recording.getUri();
+
+                    if( isPlaying ){
+                        stopPlaying();
+                        if( position == last_index ){
+                            recording.setPlaying(false);
+                            stopPlaying();
+                            notifyItemChanged(position);
+                        }else{
+                            Log.e("INFO", "Is Playing");
+                            markAllPaused();
+                            recording.setPlaying(true);
+                            notifyItemChanged(position);
+                            startPlaying(recording,position);
+                            last_index = position;
+                        }
+
+                    }else {
+                        if( recording.isPlaying() ){
+                            recording.setPlaying(false);
+                            stopPlaying();
+                            seekBar.setVisibility(View.GONE);
+                            params.height = params.height - 20;
+                            mCardView.setLayoutParams(params);
+                            Log.d("isPlayin","True");
+                        }else {
+                            Log.e("INFO", "Is Playing");
+                            startPlaying(recording,position);
+                            recording.setPlaying(true);
+                            seekBar.setMax(mPlayer.getDuration());
+                            params.height = params.height - 20;
+                            mCardView.setLayoutParams(params);
+                            Log.d("isPlayin","False");
+                        }
+                        notifyItemChanged(position);
+                        last_index = position;
+                    }
+
+                }
+
+            });
         }
         public void manageSeekBar(ViewHolder holder){
             holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -263,6 +270,7 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
 
 
         private void stopPlaying() {
+         //   isARecordingPlaying = false;
             try{
                 mPlayer.release();
             }catch (Exception e){
@@ -274,6 +282,7 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
 
         private void startPlaying(final Recording audio, final int position) {
             mPlayer = new MediaPlayer();
+          //  isARecordingPlaying = true;
             try {
                 mPlayer.setDataSource(recordingUri);
                 mPlayer.prepare();
