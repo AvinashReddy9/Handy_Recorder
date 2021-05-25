@@ -106,9 +106,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupTabIcons() {
-        mTabLayout.getTabAt(0).setIcon(R.drawable.mic);
+        mTabLayout.getTabAt(0).setIcon(R.drawable.recorder_microphone);
 //        mTabLayout.getTabAt(1).setIcon(R.drawable.speaker);
-        mTabLayout.getTabAt(1).setIcon(R.drawable.play);
+        mTabLayout.getTabAt(1).setIcon(R.drawable.recorder_playlist);
         // tabLayout.getTabAt(3).setIcon(tabIcons[3]);
     }
 
