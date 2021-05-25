@@ -30,47 +30,41 @@ import com.example.viewrecorder.model.Recording;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.ViewHolder>{
+public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.ViewHolder> {
 
-    private Context context;
-    private ArrayList<Recording> recordingArrayList;
-    private MediaPlayer mPlayer;
-    private boolean isPlaying = false;
+    private Context mContext;
+    private ArrayList<Recording> playListRecordings;
+    private MediaPlayer mMediaPlayer;
+    private boolean isRecordingPlaying = false;
     private int last_index = -1;
     private static final String TAG = "RecordingAdapter";
     private boolean isARecordingPlaying = false;
-    public RecordingAdapter(Context context, ArrayList<Recording> recordingArrayList){
-        this.context = context;
-        this.recordingArrayList = recordingArrayList;
+
+    public RecordingAdapter(Context mContext, ArrayList<Recording> playListRecordings) {
+        this.mContext = mContext;
+        this.playListRecordings = playListRecordings;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = LayoutInflater
-                .from(context).inflate(R.layout.recording_item_layout, parent, false);
+                .from(mContext).inflate(R.layout.recording_item_layout, parent, false);
         return new ViewHolder(view);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        setUpData(holder,position,"");
+        setUpData(holder, position, "");
         Log.e(TAG, "Position of the current item " + position);
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//               Log.e("INFO","Recording list is clicked");
-            }
-        });
-
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void setUpData(@NonNull ViewHolder holder, int position, String name) {
 
-        Recording recording = recordingArrayList.get(position);
+        Recording recording = playListRecordings.get(position);
         if (!name.isEmpty()) {
             holder.textViewName.setText(name);
         } else {
@@ -83,11 +77,9 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
             holder.seekBar.setVisibility(View.VISIBLE);
             holder.seekUpdation(holder);
         } else {
-//            if(holder != null) {
-                holder.imageViewPlay.setImageResource(R.drawable.recorder_play);
-                TransitionManager.beginDelayedTransition((ViewGroup) holder.itemView);
-                holder.seekBar.setVisibility(View.GONE);
-//            }
+            holder.imageViewPlay.setImageResource(R.drawable.recorder_play);
+            TransitionManager.beginDelayedTransition((ViewGroup) holder.itemView);
+            holder.seekBar.setVisibility(View.GONE);
         }
 
         holder.manageSeekBar(holder);
@@ -96,16 +88,16 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
 
     @Override
     public int getItemCount() {
-        return recordingArrayList.size();
+        return playListRecordings.size();
     }
 
     public String getRecordingName(int position) {
-        if( recordingArrayList == null || position >= recordingArrayList.size()) {
-            Log.e(TAG, "Size of Array:ist " + recordingArrayList.size() + "Requested position to delete " + position);
+        if (playListRecordings == null || position >= playListRecordings.size()) {
+            Log.e(TAG, "Size of Array:ist " + playListRecordings.size() + "Requested position to delete " + position);
             Log.e(TAG, "Invalid position on recycler view is requested");
             return "";
         }
-        return recordingArrayList.get(position).getFileName();
+        return playListRecordings.get(position).getFileName();
     }
 
 
@@ -119,16 +111,16 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
         private CardView mCardView;
         private int lastProgress = 0;
         private Handler mHandler = new Handler();
-        public  ViewHolder holder;
+        public ViewHolder holder;
         View view;
 
-        public void updateTextView(){
+        public void updateTextView() {
             holder.textViewName.setText(EditName.updatedName());
         }
 
         public ViewHolder(View itemView) {
             super(itemView);
-            view =itemView;
+            view = itemView;
             final View mView = itemView;
 
             imageViewPlay = itemView.findViewById(R.id.imageViewPlay);
@@ -138,34 +130,16 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
             shareButton = itemView.findViewById(R.id.share_Button);
             mCardView = itemView.findViewById(R.id.cardview);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                   // Log.e("POSITION", "Position in View Holder " + position);
-                }
-            });
-
-            textViewName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-//                    EditName name = new EditName(mView.getContext());
-//                    name.show();
-//                    int position = getAdapterPosition();
-                }
-            });
-
-
             shareButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.e("CLICKED" , "Clicked share button" + getAdapterPosition());
+                    Log.e("CLICKED", "Clicked share button" + getAdapterPosition());
                     Log.e("CLICKED", "Clicked share button file name " + getRecordingName(getAdapterPosition()));
-                    String filePath = new String(Environment.getExternalStorageDirectory() + "/ViewRecorder/Audios/" +  getRecordingName(getAdapterPosition()));
+                    String filePath = new String(Environment.getExternalStorageDirectory() + "/ViewRecorder/Audios/" + getRecordingName(getAdapterPosition()));
                     Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                     sharingIntent.setType("audio/*");
                     Uri uri = Uri.parse(filePath);
                     sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                 //   sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                     mView.getContext().startActivity(Intent.createChooser(sharingIntent, "Share via"));
                 }
             });
@@ -177,40 +151,40 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
                     params.height = params.height + 20;
                     mCardView.setLayoutParams(params);
                     int position = getAdapterPosition();
-                    Recording recording = recordingArrayList.get(position);
+                    Recording recording = playListRecordings.get(position);
                     recordingUri = recording.getUri();
 
-                    if( isPlaying ){
+                    if (isRecordingPlaying) {
                         stopPlaying();
-                        if( position == last_index ){
+                        if (position == last_index) {
                             recording.setPlaying(false);
                             stopPlaying();
                             notifyItemChanged(position);
-                        }else{
+                        } else {
                             Log.e("INFO", "Is Playing");
                             markAllPaused();
                             recording.setPlaying(true);
                             notifyItemChanged(position);
-                            startPlaying(recording,position);
+                            startPlaying(recording, position);
                             last_index = position;
                         }
 
-                    }else {
-                        if( recording.isPlaying() ){
+                    } else {
+                        if (recording.isPlaying()) {
                             recording.setPlaying(false);
                             stopPlaying();
                             seekBar.setVisibility(View.GONE);
                             params.height = params.height - 20;
                             mCardView.setLayoutParams(params);
-                            Log.d("isPlayin","True");
-                        }else {
+                            Log.d("isPlayin", "True");
+                        } else {
                             Log.e("INFO", "Is Playing");
-                            startPlaying(recording,position);
+                            startPlaying(recording, position);
                             recording.setPlaying(true);
-                            seekBar.setMax(mPlayer.getDuration());
+                            seekBar.setMax(mMediaPlayer.getDuration());
                             params.height = params.height - 20;
                             mCardView.setLayoutParams(params);
-                            Log.d("isPlayin","False");
+                            Log.d("isPlayin", "False");
                         }
                         notifyItemChanged(position);
                         last_index = position;
@@ -220,12 +194,13 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
 
             });
         }
-        public void manageSeekBar(ViewHolder holder){
+
+        public void manageSeekBar(ViewHolder holder) {
             holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if( mPlayer!=null && fromUser ){
-                        mPlayer.seekTo(progress);
+                    if (mMediaPlayer != null && fromUser) {
+                        mMediaPlayer.seekTo(progress);
                     }
                 }
 
@@ -243,9 +218,9 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
 
 
         private void markAllPaused() {
-            for( int i=0; i < recordingArrayList.size(); i++ ){
-                recordingArrayList.get(i).setPlaying(false);
-                recordingArrayList.set(i,recordingArrayList.get(i));
+            for (int i = 0; i < playListRecordings.size(); i++) {
+                playListRecordings.get(i).setPlaying(false);
+                playListRecordings.set(i, playListRecordings.get(i));
             }
             notifyDataSetChanged();
         }
@@ -259,9 +234,9 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
 
         private void seekUpdation(ViewHolder holder) {
             this.holder = holder;
-            if(mPlayer != null){
-                int mCurrentPosition = mPlayer.getCurrentPosition() ;
-                holder.seekBar.setMax(mPlayer.getDuration());
+            if (mMediaPlayer != null) {
+                int mCurrentPosition = mMediaPlayer.getCurrentPosition();
+                holder.seekBar.setMax(mMediaPlayer.getDuration());
                 holder.seekBar.setProgress(mCurrentPosition);
                 lastProgress = mCurrentPosition;
             }
@@ -270,31 +245,31 @@ public class RecordingAdapter  extends RecyclerView.Adapter<RecordingAdapter.Vie
 
 
         private void stopPlaying() {
-         //   isARecordingPlaying = false;
-            try{
-                mPlayer.release();
-            }catch (Exception e){
+            //   isARecordingPlaying = false;
+            try {
+                mMediaPlayer.release();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            mPlayer = null;
-            isPlaying = false;
+            mMediaPlayer = null;
+            isRecordingPlaying = false;
         }
 
         private void startPlaying(final Recording audio, final int position) {
-            mPlayer = new MediaPlayer();
-          //  isARecordingPlaying = true;
+            mMediaPlayer = new MediaPlayer();
+            //  isARecordingPlaying = true;
             try {
-                mPlayer.setDataSource(recordingUri);
-                mPlayer.prepare();
-                mPlayer.start();
+                mMediaPlayer.setDataSource(recordingUri);
+                mMediaPlayer.prepare();
+                mMediaPlayer.start();
             } catch (IOException e) {
                 Log.e("LOG_TAG", "prepare() failed");
             }
             //showing the pause button
-            seekBar.setMax(mPlayer.getDuration());
-            isPlaying = true;
+            seekBar.setMax(mMediaPlayer.getDuration());
+            isRecordingPlaying = true;
 
-            mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     audio.setPlaying(false);
