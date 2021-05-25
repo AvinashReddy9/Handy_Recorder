@@ -2,7 +2,6 @@ package com.example.viewrecorder.Fragments;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -26,21 +25,15 @@ import com.example.viewrecorder.R;
 import com.example.viewrecorder.model.Recording;
 
 import java.io.File;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.zip.Inflater;
-
-import javax.net.ssl.SNIHostName;
 
 public class PlayListFragment extends Fragment {
 
     private Toolbar toolbar;
-    public static RecyclerView recyclerViewRecordings;
-    private ArrayList<Recording> recordingArraylist;
-    public static RecordingAdapter recordingAdapter;
+    public static RecyclerView recordingRecylerView;
+    private ArrayList<Recording> playList;
+    public static RecordingAdapter mRecordingAdapter;
     private TextView textViewNoRecordings;
     private HashMap<String, Integer>  mHashMap =new HashMap<>();
     private static final String TAG = "PlayListFragment";
@@ -64,7 +57,7 @@ public class PlayListFragment extends Fragment {
         View root = inflater.inflate(R.layout.playlist_fragment,container,false);
         Log.e("INFO", "OnCreateView in playlist  called");
         initViews(root);
-        recordingArraylist = new ArrayList<Recording>();
+        playList = new ArrayList<Recording>();
        // init();
      //   fetchRecordings();
        Runnable runnableCode = new Runnable() {
@@ -122,7 +115,7 @@ public class PlayListFragment extends Fragment {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 Log.e("INFO", "Swiped Recordings to Delete it");
-                String currentRecordingName = recordingAdapter.getRecordingName(viewHolder.getAdapterPosition());
+                String currentRecordingName = mRecordingAdapter.getRecordingName(viewHolder.getAdapterPosition());
                 Log.e(TAG, "Current Recording Name which is Swiped to Delete" + currentRecordingName );
                 String MEDIA_PATH = new String(Environment.getExternalStorageDirectory() + "/ViewRecorder/Audios/" + currentRecordingName);
                 Log.e(TAG, "Full Media Path " + MEDIA_PATH);
@@ -134,10 +127,10 @@ public class PlayListFragment extends Fragment {
                 } else {
                     Log.e("INFO", "File doesnot exists");
                 }
-                recordingArraylist.remove(viewHolder.getAdapterPosition());
-                recordingAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                playList.remove(viewHolder.getAdapterPosition());
+                mRecordingAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
             }
-        }).attachToRecyclerView(recyclerViewRecordings);
+        }).attachToRecyclerView(recordingRecylerView);
     }
 
     private void fetchRecordings() {
@@ -160,30 +153,30 @@ public class PlayListFragment extends Fragment {
                 if(!mHashMap.containsKey(fileName)) {
                     Log.e("INFO", "New Recording has been created");
                     mHashMap.put(fileName, 1);
-                    recordingArraylist.add(0,recording);
+                    playList.add(0,recording);
                     setAdaptertoRecyclerView();
                 }
             }
 
             textViewNoRecordings.setVisibility(View.GONE);
-            recyclerViewRecordings.setVisibility(View.VISIBLE);
+            recordingRecylerView.setVisibility(View.VISIBLE);
 
         }else{
             textViewNoRecordings.setVisibility(View.VISIBLE);
-            recyclerViewRecordings.setVisibility(View.GONE);
+            recordingRecylerView.setVisibility(View.GONE);
         }
 
     }
 
     public static void refreshRecylerView() {
        // recordingAdapter.notifyDataSetChanged();
-        recordingAdapter.notifyItemInserted(0);
+        mRecordingAdapter.notifyItemInserted(0);
         Log.e("INFO",  "Refrest Recycler View");
     }
 
     private void setAdaptertoRecyclerView() {
-        recordingAdapter = new RecordingAdapter(getContext(),recordingArraylist);
-        recyclerViewRecordings.setAdapter(recordingAdapter);
+        mRecordingAdapter = new RecordingAdapter(getContext(), playList);
+        recordingRecylerView.setAdapter(mRecordingAdapter);
     }
 
     private void initViews(View view) {
@@ -198,10 +191,10 @@ public class PlayListFragment extends Fragment {
       //  getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         /** setting up recyclerView **/
-        recyclerViewRecordings = view.findViewById(R.id.recyclerViewRecordings);
-        recyclerViewRecordings.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.VERTICAL, false));
-        recyclerViewRecordings.setHasFixedSize(true);
-        recyclerViewRecordings.addItemDecoration(new RecyclerView.ItemDecoration() {
+        recordingRecylerView = view.findViewById(R.id.recyclerViewRecordings);
+        recordingRecylerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.VERTICAL, false));
+        recordingRecylerView.setHasFixedSize(true);
+        recordingRecylerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent,
                                @NonNull RecyclerView.State state) {
