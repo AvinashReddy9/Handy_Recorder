@@ -125,7 +125,7 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.View
 
             imageViewPlay = itemView.findViewById(R.id.imageViewPlay);
             seekBar = itemView.findViewById(R.id.seekBarRecorder);
-            seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#FF0000"), PorterDuff.Mode.MULTIPLY);
+            seekBar.getProgressDrawable().setColorFilter(Color.parseColor("#36454F"), PorterDuff.Mode.MULTIPLY);
             textViewName = itemView.findViewById(R.id.textViewRecordingname);
             shareButton = itemView.findViewById(R.id.share_Button);
             mCardView = itemView.findViewById(R.id.cardview);
@@ -136,10 +136,10 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.View
                     Log.e("CLICKED", "Clicked share button" + getAdapterPosition());
                     Log.e("CLICKED", "Clicked share button file name " + getRecordingName(getAdapterPosition()));
                     String filePath = new String(Environment.getExternalStorageDirectory() + "/ViewRecorder/Audios/" + getRecordingName(getAdapterPosition()));
-                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                    sharingIntent.setType("audio/*");
                     Uri uri = Uri.parse(filePath);
+                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                     sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    sharingIntent.setType("audio/*");
                     mView.getContext().startActivity(Intent.createChooser(sharingIntent, "Share via"));
                 }
             });
@@ -200,18 +200,26 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.View
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     if (mMediaPlayer != null && fromUser) {
+                        mMediaPlayer.start();
                         mMediaPlayer.seekTo(progress);
                     }
                 }
 
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {
+                   // mMediaPlayer.seekTo(0);
+                    Log.e(TAG, "SeekBar Progress touched");
+                    mMediaPlayer.pause();
 
                 }
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-
+                    if (mMediaPlayer != null) {
+                        Log.e(TAG, "SeekBar Progress" + seekBar.getProgress());
+                        mMediaPlayer.seekTo(seekBar.getProgress());
+                        mMediaPlayer.start();
+                    }
                 }
             });
         }
