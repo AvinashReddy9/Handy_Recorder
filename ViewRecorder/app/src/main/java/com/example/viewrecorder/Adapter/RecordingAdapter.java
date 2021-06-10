@@ -21,12 +21,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.viewrecorder.Dialog.EditName;
 import com.example.viewrecorder.R;
 import com.example.viewrecorder.model.Recording;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -113,6 +115,7 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.View
         private Handler mHandler = new Handler();
         public ViewHolder holder;
         View view;
+        Context context;
 
         public void updateTextView() {
             holder.textViewName.setText(EditName.updatedName());
@@ -122,6 +125,7 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.View
             super(itemView);
             view = itemView;
             final View mView = itemView;
+            context = itemView.getContext();
 
             imageViewPlay = itemView.findViewById(R.id.imageViewPlay);
             seekBar = itemView.findViewById(R.id.seekBarRecorder);
@@ -136,10 +140,11 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.View
                     Log.e("CLICKED", "Clicked share button" + getAdapterPosition());
                     Log.e("CLICKED", "Clicked share button file name " + getRecordingName(getAdapterPosition()));
                     String filePath = new String(Environment.getExternalStorageDirectory() + "/ViewRecorder/Audios/" + getRecordingName(getAdapterPosition()));
-                    Uri uri = Uri.parse(filePath);
+                    Uri uri = Uri.parse(String.valueOf(FileProvider.getUriForFile(mView.getContext(), "com.example.viewrecorder.fileprovider",new File(filePath))));
                     Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                     sharingIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                    sharingIntent.setType("audio/*");
+                    sharingIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    sharingIntent.setType("audio/mp3");
                     mView.getContext().startActivity(Intent.createChooser(sharingIntent, "Share via"));
                 }
             });
