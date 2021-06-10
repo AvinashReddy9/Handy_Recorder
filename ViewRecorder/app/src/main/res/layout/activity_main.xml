@@ -10,7 +10,8 @@
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/black"
+        android:background="#000000"
+        app:tabIndicatorColor="#FF033E"
         app:tabGravity="fill"
         app:tabMode="fixed" />
 
